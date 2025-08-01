@@ -31,9 +31,11 @@ export default function AppDashboard() {
                   <p className="text-sm text-slate-600">Escribe lo que tienes en mente</p>
                 </div>
               </div>
-              <Button className="w-full mt-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 rounded-xl">
-                Empezar
-              </Button>
+              <Link href="/app/dilemas">
+                <Button className="w-full mt-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 rounded-xl">
+                  Empezar
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 

@@ -4,7 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Brain, Home, History, User, Menu, X, TrendingUp } from "lucide-react"
+import { Brain, Home, History, User, Menu, X, TrendingUp, Eye } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export function AppNavigation() {
@@ -15,6 +15,7 @@ export function AppNavigation() {
     { name: "Inicio", href: "/app", icon: Home },
     { name: "Historial", href: "/app/historial", icon: History },
     { name: "Patrones", href: "/app/patrones", icon: TrendingUp },
+    { name: "Espejo", href: "/app/espejo", icon: Eye },
     { name: "Perfil", href: "/app/perfil", icon: User },
   ]
 
