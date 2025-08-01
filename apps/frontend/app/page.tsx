@@ -1,7 +1,10 @@
+"use client"
+ 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowRight, Edit3, Users, Lightbulb, Heart, Brain, MessageCircle } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 
 export default function LandingPage() {
   return (
@@ -15,9 +18,11 @@ export default function LandingPage() {
             </div>
             <span className="text-xl font-bold text-slate-800">Perspectiva</span>
           </div>
-          <Button variant="ghost" className="text-slate-600 hover:text-slate-800">
-            Iniciar sesión
-          </Button>
+          <Link href="/login">
+            <Button variant="ghost" className="text-slate-600 hover:text-slate-800">
+              Iniciar sesión
+            </Button>
+          </Link>
         </div>
       </nav>
 

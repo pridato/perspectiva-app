@@ -1,3 +1,5 @@
+"use client"
+
 import { AppNavigation } from "@/components/app-navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"

@@ -1,3 +1,4 @@
+
 import type React from "react"
 import "./globals.css"
 import type { Metadata } from "next"
@@ -16,11 +17,11 @@ export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
-}) {
+}) { 
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+        <ThemeProvider>
           {children}
         </ThemeProvider>
       </body>
