@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+
+  // Relaciones
+  perfil     Perfil?
+  dilemas    Dilema[]
+  patrones   Patron[]
+  espejos    Espejo[]
+  actividades Actividad[]
+  aiLogs     AiLog[]
+  userTags   UserTag[]
+}
+
+model Perfil {
+  id                     Int      @id @default(autoincrement())
+  user                  User     @relation(fields: [userId], references: [id])
+  userId                Int      @unique
+  bienestar             Int
+  autoconocimiento      Int
+  gestionEmocional      Int
+  dilemasTotales        Int      @default(0)
+  creenciasTransformadas Int     @default(0)
+  diasActivo            Int      @default(0)
+  progresoEmocional     Int      @default(0)
+  updatedAt             DateTime @updatedAt
+}
