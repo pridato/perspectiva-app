@@ -20,10 +20,11 @@ model User {
   perfil     Perfil?
   dilemas    Dilema[]
   patrones   Patron[]
-  espejos    Espejo[]
-  actividades Actividad[]
-  aiLogs     AiLog[]
-  userTags   UserTag[]
+  pensamientos Pensamiento[]
+  // espejos    Espejo[]
+  // actividades Actividad[]
+  // aiLogs     AiLog[]
+  // userTags   UserTag[]
 }
 
 model Perfil {
@@ -52,9 +53,9 @@ model Dilema {
 
   respuestas Respuesta[]
   emociones  Emocion[]
-  creencias  Creencia[]
   raices     Raiz[]
-  tags       DilemaTag[]
+  // creencias  Creencia[]
+  // tags       DilemaTag[]
 }
 
 
@@ -87,16 +88,6 @@ enum TipoPensamiento {
   interpretacion
   generalizacion
   profecia
-
-  // Emociones
-  emocion
-  miedo
-  culpa
-  frustracion
-  verguenza
-  esperanza
-  tristeza
-  ira
 
   // Motivaciones e impulsos
   impulso
@@ -144,24 +135,6 @@ model Pensamiento {
   createdAt DateTime         @default(now())
 }
 
-// CREENCIAS
-
-enum IntensidadCreencia {
-  baja
-  media
-  alta
-}
-
-model Creencia {
-  id         Int                @id @default(autoincrement())
-  dilema     Dilema             @relation(fields: [dilemaId], references: [id])
-  dilemaId   Int
-  texto      String
-  intensidad IntensidadCreencia
-  createdAt  DateTime           @default(now())
-
-  antidotos  Antidoto[]
-}
 
 // EMOCION
 
@@ -195,4 +168,74 @@ model Emocion {
   tipo       TipoEmocion   // 'culpa', 'miedo', 'ansiedad', etc. (puedes usar enum si lo prefieres)
   intensidad Int      @default(50) // Rango 0-100
   createdAt  DateTime @default(now())
+}
+
+// RAIZ
+
+enum TipoRaiz {
+  infancia
+  miedo_al_rechazo
+  baja_autoestima
+  trauma_pasado
+  condicionamiento_social
+  exigencia_parental
+  comparacion_constante
+  necesidad_de_control
+  perfeccionismo
+  dependencia_emocional
+  inseguridad
+  soledad
+  abandono
+  idealizacion
+  culpa_inconsciente
+  fracaso_no_resuelto
+  carencia_afectiva
+  miedo_al_conflicto
+  rechazo_anterior
+  juicio_social
+}
+
+
+model Raiz {
+  id         Int      @id @default(autoincrement())
+  dilema     Dilema   @relation(fields: [dilemaId], references: [id])
+  dilemaId   Int
+  origen     TipoRaiz
+  certeza    Int      @default(50) // Valor del 0 al 100
+  createdAt  DateTime @default(now())
+}
+
+
+// PATRON
+
+model Patron {
+  id               Int      @id @default(autoincrement())
+  user             User     @relation(fields: [userId], references: [id])
+  userId           Int
+  tipo             TipoPatron
+  frecuencia       Int      @default(1)
+  ultimaDetectada  DateTime @default(now())
+}
+
+enum TipoPatron {
+  autoexigencia
+  catastrofismo
+  perfeccionismo
+  pensamiento_dicotomico
+  lectura_de_mente
+  sobregeneralizacion
+  filtro_negativo
+  culpabilizacion
+  deberias
+  personalizacion
+  rumiacion
+  desesperanza
+  evitacion
+  validacion_externa
+  indecision_cronica
+  negacion
+  juicio_permanente
+  comparacion_toxica
+  autosabotaje
+  hiperresponsabilidad
 }

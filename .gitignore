@@ -1,0 +1,65 @@
+node_modules
+
+# Archivos y carpetas de Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Archivos de entorno
+.env
+.env.*.local
+
+# Salida de compilación de TypeScript
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# Archivos de Prisma
+prisma/.env
+prisma/migrations/
+prisma/dev.db
+prisma/test.db
+
+# Archivos de configuración locales
+*.local
+*.env.local
+
+# Archivos de logs
+logs
+*.log
+
+# Archivos de cache
+.cache/
+.next/
+coverage/
+.vscode/
+.idea/
+
+# Archivos de salida de Next.js
+.next/
+out/
+
+# Archivos de salida de React
+build/
+
+# Archivos de salida de TypeScript
+*.d.ts
+
+# Archivos de pruebas
+coverage/
+
+# Archivos temporales del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de lock
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Otros
+*.swp
+*.swo
