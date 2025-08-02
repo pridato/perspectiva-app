@@ -42,7 +42,6 @@ model Perfil {
 
 
 
-
 model Dilema {
   id        Int       @id @default(autoincrement())
   user      User      @relation(fields: [userId], references: [id])
@@ -59,6 +58,9 @@ model Dilema {
 }
 
 
+
+// RESPUESTAS
+
 enum MentorTipo {
   psicologo
   filosofo
@@ -74,7 +76,7 @@ model Respuesta {
   createdAt   DateTime @default(now())
 }
 
-
+// PENSAMIENTOS
 
 enum TipoPensamiento {
   // Creencias y juicios
@@ -130,7 +132,6 @@ enum TipoPensamiento {
   negacion
 }
 
-
 model Pensamiento {
   id        Int              @id @default(autoincrement())
   user      User             @relation(fields: [userId], references: [id])
@@ -143,7 +144,7 @@ model Pensamiento {
   createdAt DateTime         @default(now())
 }
 
-
+// CREENCIAS
 
 enum IntensidadCreencia {
   baja
@@ -160,4 +161,38 @@ model Creencia {
   createdAt  DateTime           @default(now())
 
   antidotos  Antidoto[]
+}
+
+// EMOCION
+
+enum TipoEmocion {
+  miedo
+  culpa
+  tristeza
+  verguenza
+  frustracion
+  ira
+  ansiedad
+  alegria
+  esperanza
+  sorpresa
+  alivio
+  resignacion
+  euforia
+  nostalgia
+  celos
+  rechazo
+  aburrimiento
+  inseguridad
+  gratitud
+  afecto
+}
+
+model Emocion {
+  id         Int      @id @default(autoincrement())
+  dilema     Dilema   @relation(fields: [dilemaId], references: [id])
+  dilemaId   Int
+  tipo       TipoEmocion   // 'culpa', 'miedo', 'ansiedad', etc. (puedes usar enum si lo prefieres)
+  intensidad Int      @default(50) // Rango 0-100
+  createdAt  DateTime @default(now())
 }
