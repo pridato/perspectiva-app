@@ -7,6 +7,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
@@ -38,6 +40,9 @@ model Perfil {
   updatedAt             DateTime @updatedAt
 }
 
+
+
+
 model Dilema {
   id        Int       @id @default(autoincrement())
   user      User      @relation(fields: [userId], references: [id])
@@ -53,6 +58,7 @@ model Dilema {
   tags       DilemaTag[]
 }
 
+
 enum MentorTipo {
   psicologo
   filosofo
@@ -66,4 +72,73 @@ model Respuesta {
   mentorTipo  MentorTipo
   contenido   String
   createdAt   DateTime @default(now())
+}
+
+
+
+enum TipoPensamiento {
+  // Creencias y juicios
+  creencia
+  juicio
+  etiqueta
+  suposicion
+  interpretacion
+  generalizacion
+  profecia
+
+  // Emociones
+  emocion
+  miedo
+  culpa
+  frustracion
+  verguenza
+  esperanza
+  tristeza
+  ira
+
+  // Motivaciones e impulsos
+  impulso
+  necesidad
+  deseo
+  intencion
+  objetivo
+  meta
+  proposito
+
+  // Valores y moral
+  valor
+  norma
+  ideal
+  mandato
+
+  // Pensamiento racional y narrativo
+  razonamiento
+  justificacion
+  explicacion
+  historia_personal
+  recuerdo
+  experiencia_pasada
+  comparacion
+
+  // Distorsiones o patrones negativos
+  catastrofe
+  autoexigencia
+  victimismo
+  desesperanza
+  rumiacion
+  obsesion
+  negacion
+}
+
+
+model Pensamiento {
+  id        Int              @id @default(autoincrement())
+  user      User             @relation(fields: [userId], references: [id])
+  userId    Int
+  padre     Pensamiento?     @relation("PadreHijo", fields: [padreId], references: [id])
+  padreId   Int?
+  hijos     Pensamiento[]    @relation("PadreHijo")
+  contenido String
+  tipo      TipoPensamiento
+  createdAt DateTime         @default(now())
 }
