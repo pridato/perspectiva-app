@@ -142,3 +142,22 @@ model Pensamiento {
   tipo      TipoPensamiento
   createdAt DateTime         @default(now())
 }
+
+
+
+enum IntensidadCreencia {
+  baja
+  media
+  alta
+}
+
+model Creencia {
+  id         Int                @id @default(autoincrement())
+  dilema     Dilema             @relation(fields: [dilemaId], references: [id])
+  dilemaId   Int
+  texto      String
+  intensidad IntensidadCreencia
+  createdAt  DateTime           @default(now())
+
+  antidotos  Antidoto[]
+}
