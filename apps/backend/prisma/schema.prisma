@@ -37,3 +37,18 @@ model Perfil {
   progresoEmocional     Int      @default(0)
   updatedAt             DateTime @updatedAt
 }
+
+model Dilema {
+  id        Int       @id @default(autoincrement())
+  user      User      @relation(fields: [userId], references: [id])
+  userId    Int
+  titulo    String
+  contenido String
+  createdAt DateTime  @default(now())
+
+  respuestas Respuesta[]
+  emociones  Emocion[]
+  creencias  Creencia[]
+  raices     Raiz[]
+  tags       DilemaTag[]
+}
