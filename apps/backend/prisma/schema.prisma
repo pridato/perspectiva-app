@@ -52,3 +52,18 @@ model Dilema {
   raices     Raiz[]
   tags       DilemaTag[]
 }
+
+enum MentorTipo {
+  psicologo
+  filosofo
+  amigo
+}
+
+model Respuesta {
+  id          Int       @id @default(autoincrement())
+  dilema      Dilema    @relation(fields: [dilemaId], references: [id])
+  dilemaId    Int
+  mentorTipo  MentorTipo
+  contenido   String
+  createdAt   DateTime @default(now())
+}
