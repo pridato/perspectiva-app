@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Put, Delete, Body, Param, UseGuards, Request, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
 interface AuthenticatedRequest extends Request {
   user: {
@@ -63,15 +64,8 @@ export class UsersController {
      * @returns Usuario solicitado
      */
     @Get(':id')
-    async getUserById(@Request() req: AuthenticatedRequest, @Param('id') id: string) {
-        // Verificar que el usuario sea admin o sea el mismo usuario
-        const userId = req.user.userId;
-        const userRole = req.user.role;
-        
-        if (userRole !== 'admin' && userId !== parseInt(id)) {
-            throw new UnauthorizedException('No tienes permisos para acceder a este recurso');
-        }
-
+    @Roles('admin')
+    async getUserById(@Param('id') id: string) {
         const user = await this.usersService.findById(parseInt(id));
         
         if (!user) {
@@ -90,14 +84,8 @@ export class UsersController {
      * @returns Mensaje de confirmación
      */
     @Delete(':id')
-    async deleteUser(@Request() req: AuthenticatedRequest, @Param('id') id: string) {
-        // Verificar que el usuario sea admin
-        const userRole = req.user.role;
-        
-        if (userRole !== 'admin') {
-            throw new UnauthorizedException('No tienes permisos para realizar esta acción');
-        }
-
+    @Roles('admin')
+    async deleteUser(@Param('id') id: string) {
         const deleted = await this.usersService.deleteUser(parseInt(id));
         
         if (!deleted) {
