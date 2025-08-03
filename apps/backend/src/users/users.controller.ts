@@ -2,7 +2,7 @@ import { Controller, Get, Put, Delete, Body, Param, UseGuards, Request, Unauthor
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Roles } from '../auth/decorators/roles.decorator';
 
 interface AuthenticatedRequest extends Request {
   user: {

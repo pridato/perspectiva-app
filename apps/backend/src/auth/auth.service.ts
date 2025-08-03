@@ -4,6 +4,9 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './dto/register.dto';
 import { EmailService } from './email.service';
+import { User } from './entities/user.entity';
+import { AuthResponse } from './entities/auth-response.entity';
+import { TokenPayload } from './entities/token-payload.entity';
 
 @Injectable()
 /**
@@ -28,7 +31,7 @@ export class AuthService {
    * @param registerDto - Los datos del usuario a registrar
    * @returns El usuario registrado sin la contraseña
    */
-  async register(registerDto: RegisterDto) {
+  async register(registerDto: RegisterDto): Promise<Omit<User, 'password'>> {
     // Verificar si el usuario ya existe
     const existingUser = await this.usersService.findByEmail(registerDto.email);
     if (existingUser) {
@@ -49,7 +52,7 @@ export class AuthService {
    * @param password - La contraseña del usuario
    * @returns El usuario si las credenciales son válidas, null en caso contrario
    */
-  async validateUser(email: string, password: string) {
+  async validateUser(email: string, password: string): Promise<Omit<User, 'password'> | null> {
     const user = await this.usersService.findByEmail(email);
     if (!user) return null;
 
@@ -71,16 +74,28 @@ export class AuthService {
    * @param user - El usuario a generar el token
    * @returns El token JWT
    */
-  async login(user: any) {
+  async login(user: Omit<User, 'password'>): Promise<AuthResponse> {
     // generamos el payload del token, es decir, los datos que queremos incluir en el token
-    const payload = {
+    const payload: TokenPayload = {
       email: user.email,
       sub: user.id,
       role: user.role,
     };
 
     // generamos el token JWT
-    return { access_token: this.jwtService.sign(payload) };
+    const token = this.jwtService.sign(payload);
+    
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        emailVerified: user.emailVerified,
+        role: user.role,
+        createdAt: user.createdAt,
+      },
+      token: { access_token: token }
+    };
   }
 
   /**

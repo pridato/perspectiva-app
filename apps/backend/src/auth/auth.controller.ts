@@ -6,6 +6,8 @@ import { VerifyEmailDto } from './dto/verify-email.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ResetPasswordConfirmDto } from './dto/reset-password-confirm.dto';
 import { UsersService } from '../users/users.service';
+import { AuthResponse } from './entities/auth-response.entity';
+import { User } from './entities/user.entity';
 
 @Controller('auth')
 /**
@@ -116,13 +118,7 @@ export class AuthController {
      * @param user - El usuario a formatear
      * @returns El usuario formateado y el token JWT
      */
-    private async formatUserResponse(user: { id: number; email: string; name: string | null; emailVerified: boolean; emailVerificationToken: string | null; emailVerificationExpires: Date | null; role: string; createdAt: Date; }) {
-        const token = await this.authService.login(user);
-        const { id, emailVerificationExpires, emailVerificationToken, ...userFormatted } = user;
-
-        return {
-            user: userFormatted,
-            token: token
-        };
+    private async formatUserResponse(user: Omit<User, 'password'>): Promise<AuthResponse> {
+        return await this.authService.login(user);
     }
 }

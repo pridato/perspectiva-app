@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { TokenPayload } from '../entities/token-payload.entity';
 
 @Injectable()
 /**
@@ -24,7 +25,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
    * @param payload - El payload del token JWT
    * @returns El usuario autenticado
    */
-  async validate(payload: any) {
+  async validate(payload: TokenPayload) {
     // Este objeto será accesible como req.user en controladores protegidos
     return {
       userId: payload.sub,
