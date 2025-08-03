@@ -1,13 +1,13 @@
 "use client"
 
 import { useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CheckCircle, XCircle, Loader2 } from "lucide-react"
 import Link from "next/link"
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
   const searchParams = useSearchParams()
   const token = searchParams.get("token")
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading")
@@ -77,7 +77,7 @@ export default function VerifyEmailPage() {
               <XCircle className="w-12 h-12 text-red-600 mx-auto" />
               <h2 className="text-2xl font-bold text-slate-800">Error de verificación</h2>
               <p className="text-slate-600">{message}</p>
-              <Link href="/login">
+              <Link href="/auth/login">
                 <Button variant="outline" className="rounded-xl">
                   Volver al login
                 </Button>
@@ -87,5 +87,25 @@ export default function VerifyEmailPage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-indigo-50/30 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md border-0 shadow-2xl rounded-2xl">
+          <CardContent className="p-8 text-center">
+            <div className="space-y-4">
+              <Loader2 className="w-12 h-12 text-purple-600 animate-spin mx-auto" />
+              <h2 className="text-2xl font-bold text-slate-800">Cargando...</h2>
+              <p className="text-slate-600">Por favor espera un momento</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    }>
+      <VerifyEmailContent />
+    </Suspense>
   )
 }

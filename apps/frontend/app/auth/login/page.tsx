@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -11,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Brain, Mail, Lock, Eye, EyeOff } from "lucide-react"
 import { toast } from "sonner"
+import Link from "next/link"
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -36,21 +36,20 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       })
 
-      console.log(response)
       if (!response.ok) {
         throw new Error("Error al iniciar sesión: " + response.statusText)
       }
 
       const data = await response.json()
-
       if (data.user) {
         localStorage.setItem("token", data.token)
         router.push("/app/dilemas")
       } else {
-        throw new Error("Error al iniciar sesión: " + data.message)
+        throw new Error("Error al iniciar sesión: " + data)
       }
-    } catch (error) {
-      toast.error("Error al iniciar sesión: " + error)
+    } catch (error:any) {
+      toast.error(error.message)
+      setIsLoading(false)
     }
   }
 
@@ -171,9 +170,9 @@ export default function LoginPage() {
             </form>
 
             <div className="text-center">
-              <button className="hover:cursor-pointer text-sm text-purple-600 hover:text-purple-700 font-medium">
+              <Link href="/auth/reset-password" className="hover:cursor-pointer text-sm text-purple-600 hover:text-purple-700 font-medium">
                 ¿Olvidaste tu contraseña?
-              </button>
+              </Link>
             </div>
           </CardContent>
         </Card>
