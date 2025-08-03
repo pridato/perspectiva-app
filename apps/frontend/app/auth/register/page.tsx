@@ -44,8 +44,6 @@ export default function RegisterPage() {
     setSuccess("")
 
     try {
-        console.log(formData)
-        console.log(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/register`)
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/register`, {
         method: "POST",
         headers: {
@@ -55,7 +53,6 @@ export default function RegisterPage() {
       })
 
       const data = await response.json()
-      console.log(data)
       if (response.ok) {
         toast.success("¡Registro exitoso! Revisa tu email para verificar tu cuenta.", {
           description: "Verifica tus datos e intenta nuevamente",

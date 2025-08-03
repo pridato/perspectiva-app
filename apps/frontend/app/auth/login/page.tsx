@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Brain, Mail, Lock, Eye, EyeOff } from "lucide-react"
+import { toast } from "sonner"
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -29,11 +30,15 @@ export default function LoginPage() {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`, {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ email, password }),
       })
 
+      console.log(response)
       if (!response.ok) {
-        throw new Error("Error al iniciar sesión")
+        throw new Error("Error al iniciar sesión: " + response.statusText)
       }
 
       const data = await response.json()
@@ -45,7 +50,7 @@ export default function LoginPage() {
         throw new Error("Error al iniciar sesión: " + data.message)
       }
     } catch (error) {
-      console.error("Error al iniciar sesión:", error)
+      toast.error("Error al iniciar sesión: " + error)
     }
   }
 
