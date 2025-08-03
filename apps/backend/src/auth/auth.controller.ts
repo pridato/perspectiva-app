@@ -46,13 +46,14 @@ export class AuthController {
      */
     @Post('login')
     async login(@Body() loginDto: LoginDto) {
-        const user = await this.authService.validateUser(loginDto.email, loginDto.password);
-        
-        if (!user) {
-            throw new UnauthorizedException('Credenciales inválidas');
+        try {
+            const user = await this.authService.validateUser(loginDto.email, loginDto.password);
+            if (!user) throw new Error('Credenciales inválidas');
+            
+            return this.formatUserResponse(user);
+        } catch (error: any) {
+            throw new UnauthorizedException(error.message);
         }
-
-        return this.formatUserResponse(user);
     }
 
     /**

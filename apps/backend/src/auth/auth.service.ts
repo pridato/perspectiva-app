@@ -54,8 +54,13 @@ export class AuthService {
     if (!user) return null;
 
     const isMatch = await bcrypt.compare(password, user.password);
-    // const isMatch = password === user.password; // TODO: cambiar a bcrypt
-    if (!isMatch) return null;
+    if (!isMatch) {
+      throw new Error('Credenciales inválidas');
+    }
+
+    if(!user.emailVerified) {
+      throw new Error('Email no verificado, por favor verifica tu email');
+    }
 
     const { password: _, ...userWithoutPassword } = user;
     return userWithoutPassword;

@@ -36,11 +36,11 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       })
 
+      const data = await response.json()
       if (!response.ok) {
-        throw new Error("Error al iniciar sesión: " + response.statusText)
+        throw new Error(data.message)
       }
 
-      const data = await response.json()
       if (data.user) {
         localStorage.setItem("token", data.token)
         router.push("/app/dilemas")

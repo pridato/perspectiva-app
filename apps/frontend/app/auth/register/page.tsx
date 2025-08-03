@@ -59,12 +59,7 @@ export default function RegisterPage() {
           dismissible: true,
           cancel: true,
         })
-        if(data.user && data.token) {
-          localStorage.setItem("token", data.token)
-          router.push("/app/dilemas")
-        } else {
-          router.push("/auth/login")
-        }
+        router.push("/auth/login")
       } else {
         toast.error(data.message || "Error al registrar usuario", {
           description: "Verifica tus datos e intenta nuevamente",
