@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 /**
@@ -15,6 +16,26 @@ export class AuthService {
    * @param jwtService - Servicio para manejar los tokens JWT
    */
   constructor(private readonly usersService: UsersService, private readonly jwtService: JwtService ) {}
+
+  /**
+   * Registra un nuevo usuario
+   * @param registerDto - Los datos del usuario a registrar
+   * @returns El usuario registrado sin la contraseña
+   */
+  async register(registerDto: RegisterDto) {
+    // Verificar si el usuario ya existe
+    const existingUser = await this.usersService.findByEmail(registerDto.email);
+    if (existingUser) {
+      throw new Error('El email ya está registrado');
+    }
+
+    // Crear el nuevo usuario
+    const user = await this.usersService.create(registerDto);
+    
+    // Retornar usuario sin contraseña
+    const { password: _, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  }
 
   /**
    * Valida las credenciales de un usuario
