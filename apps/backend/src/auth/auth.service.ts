@@ -3,6 +3,7 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './dto/register.dto';
+import { EmailService } from './email.service';
 
 @Injectable()
 /**
@@ -14,8 +15,13 @@ export class AuthService {
    * Constructor del servicio de autenticación
    * @param usersService - Servicio para manejar las operaciones de los usuarios
    * @param jwtService - Servicio para manejar los tokens JWT
+   * @param emailService - Servicio para manejar el envío de emails
    */
-  constructor(private readonly usersService: UsersService, private readonly jwtService: JwtService ) {}
+  constructor(
+    private readonly usersService: UsersService, 
+    private readonly jwtService: JwtService,
+    private readonly emailService: EmailService
+  ) {}
 
   /**
    * Registra un nuevo usuario
@@ -70,5 +76,56 @@ export class AuthService {
 
     // generamos el token JWT
     return { access_token: this.jwtService.sign(payload) };
+  }
+
+  /**
+   * Solicita reset de contraseña
+   * @param email - Email del usuario
+   * @returns Mensaje de confirmación
+   */
+  async requestResetPassword(email: string) {
+    const user = await this.usersService.findByEmail(email);
+    if (!user) {
+      // Por seguridad, no revelamos si el email existe o no
+      return { message: 'Si el email existe, recibirás un enlace de recuperación' };
+    }
+
+    const token = this.emailService.generateVerificationToken();
+    const expires = this.emailService.generateExpirationDate();
+
+    // Guardar token en la base de datos
+    await this.usersService.updateResetPasswordToken(user.id, token, expires);
+
+    // Enviar email
+    await this.emailService.sendResetPasswordEmail(email, token);
+
+    return { message: 'Si el email existe, recibirás un enlace de recuperación' };
+  }
+
+  /**
+   * Confirma reset de contraseña
+   * @param token - Token de reset
+   * @param password - Nueva contraseña
+   * @returns Mensaje de confirmación
+   */
+  async confirmResetPassword(token: string, password: string) {
+    const user = await this.usersService.findByResetPasswordToken(token);
+    
+    if (!user) {
+      throw new Error('Token de reset inválido o expirado');
+    }
+
+    // Verificar que el token no haya expirado
+    if (user.resetPasswordExpires && new Date() > user.resetPasswordExpires) {
+      throw new Error('Token de reset expirado');
+    }
+
+    // Hashear nueva contraseña
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Actualizar contraseña y limpiar token
+    await this.usersService.updatePasswordAndClearResetToken(user.id, hashedPassword);
+
+    return { message: 'Contraseña actualizada correctamente' };
   }
 }

@@ -98,5 +98,55 @@ export class UsersService {
 
         return updatedUser;
     }
+
+    /**
+     * Actualiza el token de reset de contraseña
+     * @param userId - ID del usuario
+     * @param token - Token de reset
+     * @param expires - Fecha de expiración
+     * @returns El usuario actualizado
+     */
+    async updateResetPasswordToken(userId: number, token: string, expires: Date) {
+        return prisma.user.update({
+            where: { id: userId },
+            data: {
+                resetPasswordToken: token,
+                resetPasswordExpires: expires,
+            },
+        });
+    }
+
+    /**
+     * Busca un usuario por su token de reset de contraseña
+     * @param token - Token de reset
+     * @returns El usuario encontrado o null si no se encuentra
+     */
+    async findByResetPasswordToken(token: string) {
+        return prisma.user.findFirst({
+            where: {
+                resetPasswordToken: token,
+                resetPasswordExpires: {
+                    gt: new Date(),
+                },
+            },
+        });
+    }
+
+    /**
+     * Actualiza la contraseña y limpia el token de reset
+     * @param userId - ID del usuario
+     * @param hashedPassword - Contraseña hasheada
+     * @returns El usuario actualizado
+     */
+    async updatePasswordAndClearResetToken(userId: number, hashedPassword: string) {
+        return prisma.user.update({
+            where: { id: userId },
+            data: {
+                password: hashedPassword,
+                resetPasswordToken: null,
+                resetPasswordExpires: null,
+            },
+        });
+    }
 }
 

@@ -3,6 +3,8 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ResetPasswordConfirmDto } from './dto/reset-password-confirm.dto';
 import { UsersService } from '../users/users.service';
 
 @Controller('auth')
@@ -75,6 +77,37 @@ export class AuthController {
                 emailVerified: true,
             }
         };
+    }
+
+    /**
+     * Solicita reset de contraseña
+     * @param resetPasswordDto - Los datos para reset de contraseña
+     * @returns Mensaje de confirmación
+     */
+    @Post('reset-password')
+    async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+        try {
+            return await this.authService.requestResetPassword(resetPasswordDto.email);
+        } catch (error: any) {
+            throw new BadRequestException(error.message);
+        }
+    }
+
+    /**
+     * Confirma reset de contraseña
+     * @param resetPasswordConfirmDto - Los datos para confirmar reset de contraseña
+     * @returns Mensaje de confirmación
+     */
+    @Post('reset-password/confirm')
+    async resetPasswordConfirm(@Body() resetPasswordConfirmDto: ResetPasswordConfirmDto) {
+        try {
+            return await this.authService.confirmResetPassword(
+                resetPasswordConfirmDto.token,
+                resetPasswordConfirmDto.password
+            );
+        } catch (error: any) {
+            throw new BadRequestException(error.message);
+        }
     }
 
     /**

@@ -2,7 +2,6 @@
 
 import type React from "react"
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -17,7 +16,6 @@ export default function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isEmailSent, setIsEmailSent] = useState(false)
   const [error, setError] = useState("")
-  const router = useRouter()
 
   /**
    * Maneja el envío del email de recuperación
@@ -60,40 +58,6 @@ export default function ResetPasswordPage() {
     }
   }
 
-  /**
-   * Maneja el reenvío del email
-   */
-  const handleResendEmail = async () => {
-    setIsLoading(true)
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/reset-password`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Error al reenviar el email")
-      }
-
-      toast.success("Email reenviado correctamente", {
-        description: "Revisa tu bandeja de entrada nuevamente",
-        dismissible: true,
-        cancel: true,
-      })
-    } catch (error: any) {
-      toast.error("Error al reenviar el email", {
-        description: error.message,
-        dismissible: true,
-        cancel: true,
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/40 to-indigo-50/40 flex items-center justify-center p-4">
@@ -169,6 +133,7 @@ export default function ResetPasswordPage() {
               </>
             ) : (
               <>
+                {/* Email enviado */}
                 <div className="text-center mb-6">
                   <div className="flex justify-center mb-4">
                     <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
@@ -182,39 +147,10 @@ export default function ResetPasswordPage() {
                     Hemos enviado un enlace de recuperación a <strong>{email}</strong>
                   </p>
                 </div>
-
-                <div className="space-y-4">
-                  <Button
-                    onClick={handleResendEmail}
-                    disabled={isLoading}
-                    variant="outline"
-                    className="w-full h-12 border-slate-200 hover:border-purple-300 text-slate-700 hover:text-purple-700 rounded-2xl font-medium"
-                  >
-                    {isLoading ? (
-                      <div className="flex items-center space-x-2">
-                        <div className="w-4 h-4 border-2 border-slate-400 border-t-transparent rounded-full animate-spin"></div>
-                        <span>Reenviando...</span>
-                      </div>
-                    ) : (
-                      "Reenviar email"
-                    )}
-                  </Button>
-
-                  <Button
-                    onClick={() => {
-                      setIsEmailSent(false)
-                      setEmail("")
-                      setError("")
-                    }}
-                    variant="ghost"
-                    className="w-full h-12 text-slate-600 hover:text-slate-800 rounded-2xl font-medium"
-                  >
-                    Usar otro email
-                  </Button>
-                </div>
               </>
             )}
 
+            {/* Volver al inicio de sesión */}
             <div className="text-center pt-4">
               <Link 
                 href="/auth/login" 
@@ -227,7 +163,7 @@ export default function ResetPasswordPage() {
           </CardContent>
         </Card>
 
-        {/* Footer */}
+        {/* Footer - Regístrate aquí */}
         <div className="text-center mt-6">
           <p className="text-slate-500 text-sm">
             ¿No tienes cuenta?{" "}

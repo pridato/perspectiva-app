@@ -59,4 +59,26 @@ export class EmailService {
     
     return Promise.resolve();
   }
+
+  /**
+   * Envía email de reset de contraseña
+   * @param email - Email del usuario
+   * @param token - Token de reset de contraseña
+   */
+  async sendResetPasswordEmail(email: string, token: string): Promise<void> {
+    await resend.emails.send({
+      from: `Perspectiva <${process.env.RESEND_FROM_EMAIL}>`,
+      to: email,
+      subject: 'Restablece tu contraseña',
+      html: `
+        <h1>Restablece tu contraseña</h1>
+        <p>Has solicitado restablecer tu contraseña en Perspectiva.</p>
+        <p>Haz clic en el siguiente enlace para crear una nueva contraseña:</p>
+        <a href="${process.env.FRONTEND_URL}/auth/reset-password/confirm?token=${token}">Restablecer contraseña</a>
+        <div style="font-size: 12px; color: #666;">${process.env.FRONTEND_URL}/auth/reset-password/confirm?token=${token}</div>
+        <p>Este enlace expirará en 24 horas.</p>
+        <p>Si no solicitaste este cambio, puedes ignorar este email.</p>
+      `
+    });
+  }
 } 
