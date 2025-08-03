@@ -55,7 +55,7 @@ export default function RegisterPage() {
       })
 
       const data = await response.json()
-
+      console.log(data)
       if (response.ok) {
         toast.success("¡Registro exitoso! Revisa tu email para verificar tu cuenta.", {
           description: "Verifica tus datos e intenta nuevamente",
@@ -70,9 +70,10 @@ export default function RegisterPage() {
           cancel: true,
         })
       }
-    } catch (error) {
+    } catch (error: any) {
+      
       toast.error("Error al registrar usuario", {
-        description: "Verifica tus datos e intenta nuevamente",
+        description: error.message,
         dismissible: true,
         cancel: true,
       })

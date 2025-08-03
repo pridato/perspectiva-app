@@ -33,10 +33,7 @@ export class AuthController {
 
             return this.formatUserResponse(user);
         } catch (error: any) {
-            if (error.code === 'P2002') {
-                throw new ConflictException('El email ya está registrado');
-            }
-            throw error;
+            throw new ConflictException(error.message);
         }
     }
 
