@@ -64,7 +64,7 @@ export class AuthController {
     @Post('verify-email')
     async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
         const user = await this.usersService.verifyEmail(verifyEmailDto.token);
-        
+            
         if (!user) {
             throw new BadRequestException('Token de verificación inválido o expirado');
         }

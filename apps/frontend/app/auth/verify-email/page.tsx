@@ -1,18 +1,22 @@
 "use client"
 
-import { useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState, Suspense } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CheckCircle, XCircle, Loader2 } from "lucide-react"
 import Link from "next/link"
 
+
 function VerifyEmailContent() {
   const searchParams = useSearchParams()
   const token = searchParams.get("token")
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading")
   const [message, setMessage] = useState("")
-
+  const router = useRouter()
+  /**
+   * Verifica el email del usuario
+   */
   useEffect(() => {
     if (!token) {
       setStatus("error")
@@ -20,7 +24,9 @@ function VerifyEmailContent() {
       return
     }
 
-    // Llamar al backend para verificar el token
+    /**
+     * Verifica el email del usuario
+     */
     const verifyEmail = async () => {
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/verify-email`, {
@@ -30,17 +36,21 @@ function VerifyEmailContent() {
           },
           body: JSON.stringify({ token }),
         })
-
-        if (response.ok) {
-          setStatus("success")
-          setMessage("¡Email verificado exitosamente!")
+        const data = await response.json()
+        if (data.user) {
+          localStorage.setItem("token", data.token)
+          setMessage(data.message || "Tu email ha sido verificado correctamente. Serás redirigido en unos segundos...")
+          setTimeout(() => {
+            setStatus("success")
+            router.push("/app/dilemas")
+          }, 2000) // 2 segundos de pausa antes de redirigir
         } else {
           setStatus("error")
-          setMessage("Token inválido o expirado")
+          setMessage(data.message)
         }
-      } catch (error) {
+      } catch (error: any) {
         setStatus("error")
-        setMessage("Error al verificar el email")
+        setMessage(error.message)
       }
     }
 

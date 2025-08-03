@@ -34,8 +34,7 @@ export class UsersService {
         const hashedPassword = await bcrypt.hash(registerDto.password, 10);
         const verificationToken = this.emailService.generateVerificationToken();
         const expirationDate = this.emailService.generateExpirationDate();
-  
-        // Crear el usuario con token y fecha de expiración de token de verificación de email
+
         const user = await prisma.user.create({
             data: {
               name: registerDto.name,
@@ -52,6 +51,7 @@ export class UsersService {
                 user.email, 
                 verificationToken
               );
+              console.log("Email de verificación enviado")
           } catch (error) {
             console.error('Error al enviar el email de verificación:', error);
             throw new Error('Error al enviar el email de verificación');
@@ -71,7 +71,7 @@ export class UsersService {
             where: {
                 emailVerificationToken: token,
                 emailVerificationExpires: {
-                    gt: new Date(),
+                    gt: new Date(), // La fecha de expiración debe ser mayor que ahora
                 },
             },
         });
@@ -126,7 +126,7 @@ export class UsersService {
             where: {
                 resetPasswordToken: token,
                 resetPasswordExpires: {
-                    gt: new Date(),
+                    gt: new Date(), // La fecha de expiración debe ser mayor que ahora
                 },
             },
         });
