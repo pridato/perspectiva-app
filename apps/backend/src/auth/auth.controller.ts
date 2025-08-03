@@ -81,12 +81,13 @@ export class AuthController {
      * @param user - El usuario a formatear
      * @returns El usuario formateado y el token JWT
      */
-    private formatUserResponse(user: { id: number; email: string; name: string | null; emailVerified: boolean; emailVerificationToken: string | null; emailVerificationExpires: Date | null; role: string; createdAt: Date; }) {
+    private async formatUserResponse(user: { id: number; email: string; name: string | null; emailVerified: boolean; emailVerificationToken: string | null; emailVerificationExpires: Date | null; role: string; createdAt: Date; }) {
+        const token = await this.authService.login(user);
         const { id, emailVerificationExpires, emailVerificationToken, ...userFormatted } = user;
 
         return {
             user: userFormatted,
-            token: this.authService.login(user)
+            token: token
         };
     }
 }

@@ -18,17 +18,40 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const router = useRouter()
 
+  /**
+   * Maneja el inicio de sesión con email
+   * @param e - Evento del formulario
+   */
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
-    // Simular autenticación
-    setTimeout(() => {
-      setIsLoading(false)
-      router.push("/app/dilemas")
-    }, 1500)
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`, {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Error al iniciar sesión")
+      }
+
+      const data = await response.json()
+
+      if (data.user) {
+        localStorage.setItem("token", data.token)
+        router.push("/app/dilemas")
+      } else {
+        throw new Error("Error al iniciar sesión: " + data.message)
+      }
+    } catch (error) {
+      console.error("Error al iniciar sesión:", error)
+    }
   }
 
+  /**
+   * Maneja el inicio de sesión con Google
+   */
   const handleGoogleLogin = async () => {
     setIsLoading(true)
 
