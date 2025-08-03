@@ -100,6 +100,46 @@ export class UsersService {
     }
 
     /**
+     * Busca un usuario por su ID
+     * @param id - ID del usuario
+     * @returns El usuario encontrado o null si no se encuentra
+     */
+    async findById(id: number) {
+        return prisma.user.findUnique({
+            where: { id },
+        });
+    }
+
+    /**
+     * Actualiza el perfil de un usuario
+     * @param userId - ID del usuario
+     * @param updateData - Datos a actualizar
+     * @returns El usuario actualizado
+     */
+    async updateProfile(userId: number, updateData: { name?: string; email?: string }) {
+        return prisma.user.update({
+            where: { id: userId },
+            data: updateData,
+        });
+    }
+
+    /**
+     * Elimina un usuario
+     * @param userId - ID del usuario a eliminar
+     * @returns true si se eliminó correctamente, false si no se encontró
+     */
+    async deleteUser(userId: number): Promise<boolean> {
+        try {
+            await prisma.user.delete({
+                where: { id: userId },
+            });
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    /**
      * Actualiza el token de reset de contraseña
      * @param userId - ID del usuario
      * @param token - Token de reset
