@@ -18,13 +18,14 @@ export class AuthController {
     /**
      * Registra un nuevo usuario
      * @param registerDto - Los datos del usuario a registrar
-     * @returns El token JWT del usuario registrado
+     * @returns El objeto del usuario y el token JWT
      */
     @Post('register')
     async register(@Body() registerDto: RegisterDto) {
         try {
             const user = await this.authService.register(registerDto);
-            return this.authService.login(user);
+
+            return this.formatUserResponse(user);
         } catch (error: any) {
             if (error.code === 'P2002') {
                 throw new ConflictException('El email ya está registrado');
@@ -45,6 +46,20 @@ export class AuthController {
             throw new UnauthorizedException('Credenciales inválidas');
         }
 
-        return this.authService.login(user);
+        return this.formatUserResponse(user);
+    }
+
+    /**
+     * Formatea la respuesta del usuario
+     * @param user - El usuario a formatear
+     * @returns El usuario formateado y el token JWT
+     */
+    private formatUserResponse(user: { id: number; email: string; name: string | null; emailVerified: boolean; emailVerificationToken: string | null; emailVerificationExpires: Date | null; role: string; createdAt: Date; }) {
+        const { id, emailVerificationExpires, emailVerificationToken, ...userFormatted } = user;
+
+        return {
+            user: userFormatted,
+            token: this.authService.login(user)
+        };
     }
 }
