@@ -11,7 +11,9 @@ const prisma = new PrismaClient();
  * Servicio para manejar las operaciones de los usuarios
  */
 export class UsersService {
+
     constructor(private readonly emailService: EmailService) {}
+
     /**
      * Busca un usuario por su email
      * @param email - El email del usuario a buscar
@@ -57,6 +59,44 @@ export class UsersService {
           
         
           return user;
+    }
+
+    /**
+     * Verifica el email de un usuario
+     * @param token - Token de verificación
+     * @returns El usuario verificado o null si el token es inválido
+     */
+    async verifyEmail(token: string) {
+        const user = await prisma.user.findFirst({
+            where: {
+                emailVerificationToken: token,
+                emailVerificationExpires: {
+                    gt: new Date(),
+                },
+            },
+        });
+
+        if (!user) {
+            return null;
+        }
+
+        // Actualizar usuario como verificado
+        const updatedUser = await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                emailVerified: true,
+                emailVerificationToken: null,
+                emailVerificationExpires: null,
+            },
+        });
+
+        // Enviar email de bienvenida
+        await this.emailService.sendWelcomeEmail(
+            updatedUser.email, 
+            updatedUser.name || undefined
+        );
+
+        return updatedUser;
     }
 }
 

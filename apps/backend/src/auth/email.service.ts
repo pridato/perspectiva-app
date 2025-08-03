@@ -40,8 +40,8 @@ export class EmailService {
       subject: 'Verifica tu email',
       html: `
         <h1>¡Bienvenido a Perspectiva!</h1>
-        <a href="${process.env.FRONTEND_URL}/verify-email?token=${token}">Verificar Email</a>
-        <div style="font-size: 12px; color: #666;">${process.env.FRONTEND_URL}/verify-email?token=${token}</div>
+        <a href="${process.env.FRONTEND_URL}/auth/verify-email?token=${token}">Verificar Email</a>
+        <div style="font-size: 12px; color: #666;">${process.env.FRONTEND_URL}/auth/verify-email?token=${token}</div>
       `
     });
   }

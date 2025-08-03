@@ -18,7 +18,7 @@ export default function LandingPage() {
             </div>
             <span className="text-xl font-bold text-slate-800">Perspectiva</span>
           </div>
-          <Link href="/login">
+          <Link href="/auth/login">
             <Button variant="ghost" className="text-slate-600 hover:text-slate-800">
               Iniciar sesión
             </Button>

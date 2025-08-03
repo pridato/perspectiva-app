@@ -1,7 +1,9 @@
-import { Controller, Post, Body, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Controller, Post, Body, UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
+import { UsersService } from '../users/users.service';
 
 @Controller('auth')
 /**
@@ -12,8 +14,12 @@ export class AuthController {
     /**
      * Constructor del controlador de autenticación
      * @param authService - Servicio para manejar las operaciones de autenticación
+     * @param usersService - Servicio para manejar las operaciones de usuarios
      */
-    constructor(private readonly authService: AuthService) {}
+    constructor(
+        private readonly authService: AuthService,
+        private readonly usersService: UsersService
+    ) {}
 
     /**
      * Registra un nuevo usuario
@@ -47,6 +53,30 @@ export class AuthController {
         }
 
         return this.formatUserResponse(user);
+    }
+
+    /**
+     * Verifica el email de un usuario
+     * @param verifyEmailDto - Los datos de verificación
+     * @returns Mensaje de confirmación
+     */
+    @Post('verify-email')
+    async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
+        const user = await this.usersService.verifyEmail(verifyEmailDto.token);
+        
+        if (!user) {
+            throw new BadRequestException('Token de verificación inválido o expirado');
+        }
+
+        return {
+            message: 'Email verificado exitosamente',
+            user: {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                emailVerified: true,
+            }
+        };
     }
 
     /**
