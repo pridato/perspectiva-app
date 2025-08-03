@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { RegisterDto } from '../auth/dto/register.dto';
+import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -27,13 +28,13 @@ export class UsersService {
      * @returns El usuario creado
      */
     async create(registerDto: RegisterDto) {
-        // TODO: Implementar hash de contraseña con bcrypt
-        // const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+        const hashedPassword = await bcrypt.hash(registerDto.password, 10);
         
         return prisma.user.create({
             data: {
+                name: registerDto.name,
                 email: registerDto.email,
-                password: registerDto.password, // TODO: usar hashedPassword
+                password: hashedPassword,
                 role: 'user',
             },
         });
