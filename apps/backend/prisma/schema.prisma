@@ -11,9 +11,12 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
-  name String @default("")
   email     String   @unique
   password  String
+  name      String?
+  emailVerified Boolean @default(false)
+  emailVerificationToken String?
+  emailVerificationExpires DateTime?
   role      String   @default("user")
   createdAt DateTime @default(now())
 
