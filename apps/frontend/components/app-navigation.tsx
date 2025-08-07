@@ -4,12 +4,14 @@ import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Brain, Home, History, User, Menu, X, TrendingUp, Eye } from "lucide-react"
+import { Brain, Home, History, User, Menu, X, TrendingUp, Eye, LogOut } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/contexts/auth-context"
 
 export function AppNavigation() {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
+  const { logout, user } = useAuth()
 
   const navigation = [
     { name: "Inicio", href: "/app", icon: Home },
@@ -18,6 +20,11 @@ export function AppNavigation() {
     { name: "Espejo", href: "/app/espejo", icon: Eye },
     { name: "Perfil", href: "/app/perfil", icon: User },
   ]
+
+  const handleLogout = () => {
+    logout()
+    setIsOpen(false)
+  }
 
   return (
     <nav className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
@@ -53,6 +60,20 @@ export function AppNavigation() {
                 </Link>
               )
             })}
+            
+            {/* User info and logout */}
+            <div className="flex items-center space-x-2 ml-4 pl-4 border-l border-slate-200">
+              <span className="text-sm text-slate-600">Hola, {user?.name || user?.email}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-xl"
+                title="Cerrar sesión"
+              >
+                <LogOut className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
 
           {/* Mobile menu button */}
@@ -85,6 +106,21 @@ export function AppNavigation() {
                   </Link>
                 )
               })}
+              
+              {/* Mobile user info and logout */}
+              <div className="pt-4 border-t border-slate-200 mt-4">
+                <div className="px-4 py-2 text-sm text-slate-600">
+                  Hola, {user?.name || user?.email}
+                </div>
+                <Button
+                  variant="ghost"
+                  onClick={handleLogout}
+                  className="w-full justify-start space-x-2 px-4 py-3 rounded-xl text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Cerrar sesión</span>
+                </Button>
+              </div>
             </div>
           </div>
         )}

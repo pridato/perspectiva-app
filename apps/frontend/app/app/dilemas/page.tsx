@@ -6,10 +6,13 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Edit3, History, Brain, Loader2 } from "lucide-react"
 import Link from "next/link"
+import { useAuth } from "@/contexts/auth-context"
+import { toast } from "sonner"
 
 export default function DilemasPage() {
   const [contenido, setContenido] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const { token } = useAuth()
 
   /**
    * Maneja el envío del dilema
@@ -17,28 +20,20 @@ export default function DilemasPage() {
    */
   const handleSubmit = async () => {
     if (!contenido.trim()) {
-      alert('Por favor escribe tu dilema')
+      toast.error('Por favor escribe tu dilema')
       return
     }
 
     if (contenido.length < 10) {
-      alert('El dilema debe tener al menos 10 caracteres')
+      toast.error('El dilema debe tener al menos 10 caracteres')
       return
     }
 
     setIsLoading(true)
 
     try {
-      // Obtener token del localStorage
-      const token = localStorage.getItem('auth_token')
-      
-      if (!token) {
-        alert('No estás autenticado. Por favor inicia sesión.')
-        return
-      }
-
-      // Crear el dilema
-      const response = await fetch('http://localhost:3001/dilemas', {
+      // Crear el dilema usando el token del contexto
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001'}/dilemas`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -53,14 +48,14 @@ export default function DilemasPage() {
       const data = await response.json()
 
       if (data.success) {
-        alert('¡Dilema creado exitosamente!')
+        toast.success('¡Dilema creado exitosamente!')
         setContenido('') // Limpiar formulario
       } else {
-        alert('Error: ' + data.message)
+        toast.error('Error: ' + data.message)
       }
     } catch (error) {
       console.error('Error:', error)
-      alert('Error al crear el dilema. Revisa la consola.')
+      toast.error('Error al crear el dilema. Intenta de nuevo.')
     } finally {
       setIsLoading(false)
     }

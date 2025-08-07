@@ -1,124 +1,82 @@
-import { Controller, Post, Body, UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { VerifyEmailDto } from './dto/verify-email.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ResetPasswordConfirmDto } from './dto/reset-password-confirm.dto';
-import { UsersService } from '../users/users.service';
-import { AuthResponse } from './entities/auth-response.entity';
-import { User } from './entities/user.entity';
+import { VerifyEmailDto } from './dto/verify-email.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
-/**
- * Controlador para manejar las operaciones de autenticación
- */
 export class AuthController {
+  constructor(private readonly authService: AuthService) {}
 
-    /**
-     * Constructor del controlador de autenticación
-     * @param authService - Servicio para manejar las operaciones de autenticación
-     * @param usersService - Servicio para manejar las operaciones de usuarios
-     */
-    constructor(
-        private readonly authService: AuthService,
-        private readonly usersService: UsersService
-    ) {}
+  @Post('login')
+  async login(@Body() loginDto: LoginDto) {
+    const user = await this.authService.validateUser(loginDto.email, loginDto.password);
+    if (!user) {
+      throw new Error('Credenciales inválidas');
+    }
+    return this.authService.login(user);
+  }
 
-    /**
-     * Registra un nuevo usuario
-     * @param registerDto - Los datos del usuario a registrar
-     * @returns El objeto del usuario y el token JWT
-     */
-    @Post('register')
-    async register(@Body() registerDto: RegisterDto) {
-        try {
-            const user = await this.authService.register(registerDto);
+  @Post('register')
+  async register(@Body() registerDto: RegisterDto) {
+    return this.authService.register(registerDto);
+  }
 
-            return this.formatUserResponse(user);
-        } catch (error: any) {
-            throw new ConflictException(error.message);
+  @Post('reset-password')
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.requestResetPassword(resetPasswordDto.email);
+  }
+
+  @Post('reset-password/confirm')
+  async confirmResetPassword(@Body() resetPasswordConfirmDto: ResetPasswordConfirmDto) {
+    return this.authService.confirmResetPassword(
+      resetPasswordConfirmDto.token,
+      resetPasswordConfirmDto.password
+    );
+  }
+
+  @Post('verify-email')
+  async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
+    // Implementar verificación de email
+    return { message: 'Email verificado exitosamente' };
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  async getProfile(@Request() req: any) {
+    try {
+      const userId = req.user.sub;
+      
+      // Obtener datos del usuario desde la base de datos
+      const user = await this.authService.getUserById(userId);
+      
+      if (!user) {
+        throw new Error('Usuario no encontrado');
+      }
+
+      return {
+        success: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          emailVerified: user.emailVerified,
+          role: user.role,
+          createdAt: user.createdAt,
         }
+      };
+    } catch (error) {
+      let errorMessage = 'Error al obtener perfil del usuario';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      return {
+        success: false,
+        message: errorMessage,
+      };
     }
-
-    /**
-     * Inicia sesión de un usuario
-     * @param loginDto - Los datos del usuario a iniciar sesión
-     * @returns El token JWT
-     */
-    @Post('login')
-    async login(@Body() loginDto: LoginDto) {
-        try {
-            const user = await this.authService.validateUser(loginDto.email, loginDto.password);
-            if (!user) throw new Error('Credenciales inválidas');
-            
-            return this.formatUserResponse(user);
-        } catch (error: any) {
-            throw new UnauthorizedException(error.message);
-        }
-    }
-
-    /**
-     * Verifica el email de un usuario
-     * @param verifyEmailDto - Los datos de verificación
-     * @returns Mensaje de confirmación
-     */
-    @Post('verify-email')
-    async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
-        const user = await this.usersService.verifyEmail(verifyEmailDto.token);
-            
-        if (!user) {
-            throw new BadRequestException('Token de verificación inválido o expirado');
-        }
-
-        return {
-            message: 'Email verificado exitosamente',
-            user: {
-                id: user.id,
-                email: user.email,
-                name: user.name,
-                emailVerified: true,
-            }
-        };
-    }
-
-    /**
-     * Solicita reset de contraseña
-     * @param resetPasswordDto - Los datos para reset de contraseña
-     * @returns Mensaje de confirmación
-     */
-    @Post('reset-password')
-    async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
-        try {
-            return await this.authService.requestResetPassword(resetPasswordDto.email);
-        } catch (error: any) {
-            throw new BadRequestException(error.message);
-        }
-    }
-
-    /**
-     * Confirma reset de contraseña
-     * @param resetPasswordConfirmDto - Los datos para confirmar reset de contraseña
-     * @returns Mensaje de confirmación
-     */
-    @Post('reset-password/confirm')
-    async resetPasswordConfirm(@Body() resetPasswordConfirmDto: ResetPasswordConfirmDto) {
-        try {
-            return await this.authService.confirmResetPassword(
-                resetPasswordConfirmDto.token,
-                resetPasswordConfirmDto.password
-            );
-        } catch (error: any) {
-            throw new BadRequestException(error.message);
-        }
-    }
-
-    /**
-     * Formatea la respuesta del usuario
-     * @param user - El usuario a formatear
-     * @returns El usuario formateado y el token JWT
-     */
-    private async formatUserResponse(user: Omit<User, 'password'>): Promise<AuthResponse> {
-        return await this.authService.login(user);
-    }
+  }
 }

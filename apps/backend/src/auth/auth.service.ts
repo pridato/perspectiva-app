@@ -59,6 +59,21 @@ export class AuthService {
   }
 
   /**
+   * Obtiene un usuario por su ID
+   * @param userId - ID del usuario
+   * @returns El usuario sin la contraseña
+   */
+  async getUserById(userId: number): Promise<Omit<User, 'password'> | null> {
+    const user = await this.usersService.findById(userId);
+    if (!user) {
+      return null;
+    }
+
+    const { password: _, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  }
+
+  /**
    * Valida las credenciales de un usuario
    * @param email - El email del usuario
    * @param password - La contraseña del usuario
