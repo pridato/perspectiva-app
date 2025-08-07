@@ -42,7 +42,7 @@ export default function LoginPage() {
       }
 
       if (data.user) {
-        localStorage.setItem("token", data.token)
+        localStorage.setItem("auth_token", data.token)
         router.push("/app/dilemas")
       } else {
         throw new Error("Error al iniciar sesión: " + data)
