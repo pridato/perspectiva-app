@@ -62,6 +62,26 @@ export class UsersService {
     }
 
     /**
+     * Crea un perfil para un usuario con valores iniciales en 0
+     * @param userId - ID del usuario
+     * @returns El perfil creado
+     */
+    async createProfile(userId: number) {
+        return await prisma.perfil.create({
+            data: {
+                userId,
+                bienestar: 0,
+                autoconocimiento: 0,
+                gestionEmocional: 0,
+                dilemasTotales: 0,
+                creenciasTransformadas: 0,
+                diasActivo: 0,
+                progresoEmocional: 0,
+            },
+        });
+    }
+
+    /**
      * Verifica el email de un usuario
      * @param token - Token de verificación
      * @returns El usuario verificado o null si el token es inválido

@@ -32,18 +32,30 @@ export class AuthService {
    * @returns El usuario registrado sin la contraseña
    */
   async register(registerDto: RegisterDto): Promise<Omit<User, 'password'>> {
-    // Verificar si el usuario ya existe
-    const existingUser = await this.usersService.findByEmail(registerDto.email);
-    if (existingUser) {
-      throw new Error('El email ya está registrado');
-    }
+    try {
+      // Verificar si el usuario ya existe
+      const existingUser = await this.usersService.findByEmail(registerDto.email);
+      if (existingUser) {
+        throw new Error('El email ya está registrado');
+      }
 
-    // Crear el nuevo usuario
-    const user = await this.usersService.create(registerDto);
-    
-    // Retornar usuario sin contraseña
-    const { password: _, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+      // Crear el nuevo usuario
+      const user = await this.usersService.create(registerDto);
+      
+      // Crear perfil automáticamente con valores en 0
+      await this.createProfile(user.id);
+      
+      // Retornar usuario sin contraseña
+      const { password: _, ...userWithoutPassword } = user;
+      return userWithoutPassword;
+    } catch (error) {
+      console.error('Error en el registro:', error);
+      throw error;
+    }
+  }
+
+  async createProfile(userId: number) {
+    await this.usersService.createProfile(userId);
   }
 
   /**

@@ -26,9 +26,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
    * @returns El usuario autenticado
    */
   async validate(payload: TokenPayload) {
-    // Este objeto será accesible como req.user en controladores protegidos
+    // Cambiar userId por sub para mantener consistencia con JWT estándar
     return {
-      userId: payload.sub,
+      sub: payload.sub,        // ← Cambio aquí
       email: payload.email,
       role: payload.role,
     };
