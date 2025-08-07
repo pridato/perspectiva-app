@@ -35,7 +35,12 @@ export class DilemasController {
     @Request() req: any
   ): Promise<DilemaResponseEntity> {
     try {
-      const userId = req.user.userId; // El ID del usuario viene del JWT
+      const userId = req.user.sub; // ← Cambiar de userId a sub
+      
+      // Debug: verificar que tenemos el userId
+      console.log('User from JWT:', req.user);
+      console.log('userId:', userId);
+
       const dilema = await this.dilemasService.create(userId, createDilemaDto);
       
       return {
@@ -49,13 +54,16 @@ export class DilemasController {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      console.error('Error creating dilema:', error);
+      console.log('Request user:', req.user);
+      
       return {
         success: HTTP_CONSTANTS.RESPONSES.FAILURE,
         message: errorMessage,
         error: DILEMA_CONSTANTS.ERROR_CODES.CREATE_DILEMA_ERROR,
         meta: {
           timestamp: new Date().toISOString(),
-          userId: req.user?.userId,
+          userId: req.user?.sub, // ← Cambiar de userId a sub
         }
       };
     }
@@ -72,7 +80,7 @@ export class DilemasController {
     @Query('limit', new ParseIntPipe({ optional: true })) limit = DILEMA_CONSTANTS.PAGINATION.DEFAULT_LIMIT
   ): Promise<DilemasListResponseEntity> {
     try {
-      const userId = req.user.userId;
+      const userId = req.user.sub; // ← Cambiar de userId a sub
       const result = await this.dilemasService.findByUser(userId, page, limit);
       
       return {
@@ -93,7 +101,7 @@ export class DilemasController {
         error: DILEMA_CONSTANTS.ERROR_CODES.GET_DILEMAS_ERROR,
         meta: {
           timestamp: new Date().toISOString(),
-          userId: req.user?.userId,
+          userId: req.user?.sub, // ← Cambiar de userId a sub
           total: 0,
           page,
           limit,
